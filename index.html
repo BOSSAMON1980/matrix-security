@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEAN AMON | 3D MATRIX SECURITY COMMAND</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: #000;
+            color: #0f0;
+            font-family: 'Share Tech Mono', monospace;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        /* 3D Canvas */
+        #matrix3d {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        /* Cyber Glow Effect */
+        .cyber-glow {
+            text-shadow: 
+                0 0 5px #0f0,
+                0 0 10px #0f0,
+                0 0 20px #0f0,
+                0 0 40px #0ff,
+                0 0 80px #0ff;
+        }
+        
+        /* Main Container */
+        .matrix-container {
+            position: relative;
+            z-index: 1;
+            height: 100vh;
+            display: grid;
+            grid-template-columns: 280px 1fr 320px;
+            grid-template-rows: 100px 1fr 1fr 200px;
+            gap: 15px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+        }
+        
+        /* Header */
+        .matrix-header {
+            grid-column: 1 / -1;
+            background: linear-gradient(90deg, rgba(0, 255, 0, 0.1), rgba(0, 255, 255, 0.1));
+            border: 2px solid #0f0;
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .matrix-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.2), transparent);
+            animation: scan 3s linear infinite;
+        }
+        
+        @keyframes scan {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .logo h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 2.5rem;
+            letter-spacing: 4px;
+            color: #0f0;
+        }
+        
+        .logo .subtitle {
+            color: #0ff;
+            font-size: 0.9rem;
+            letter-spacing: 3px;
+        }
+        
+        /* Status Panel */
+        .status-panel {
+            grid-row: 2 / 4;
+            background: rgba(0, 20, 0, 0.8);
+            border: 1px solid #0f0;
+            border-radius: 10px;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+        }
+        
+        .status-item {
+            background: rgba(0, 40, 0, 0.6);
+            border-left: 4px solid #0f0;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .status-item:hover {
+            transform: translateX(10px);
+            border-left-color: #0ff;
+        }
+        
+        /* Main Dashboard */
+        .dashboard-main {
+            grid-column: 2;
+            grid-row: 2 / 4;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .dashboard-card {
+            background: rgba(0, 20, 20, 0.8);
+            border: 1px solid #0ff;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
+            border-color: #0f0;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+        }
+        
+        .card-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            color: #0ff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Terminal */
+        .matrix-terminal {
+            grid-column: 3;
+            grid-row: 2 / 4;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #0f0;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+        }
+        
+        .terminal-header {
+            background: linear-gradient(90deg, rgba(0, 255, 0, 0.2), rgba(0, 255, 255, 0.2));
+            padding: 15px;
+            border-bottom: 1px solid #0f0;
+        }
+        
+        .terminal-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        .terminal-line {
+            margin-bottom: 5px;
+            white-space: pre-wrap;
+            text-shadow: 0 0 5px currentColor;
+        }
+        
+        .prompt { color: #0f0; font-weight: bold; }
+        .command { color: #fff; }
+        .output { color: #0ff; }
+        .warning { color: #ff0; }
+        .error { color: #f00; }
+        .success { color: #0f0; }
+        
+        /* Controls */
+        .matrix-controls {
+            grid-column: 1 / -1;
+            background: rgba(0, 20, 0, 0.8);
+            border: 1px solid #0f0;
+            border-radius: 10px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+        }
+        
+        .control-btn {
+            background: linear-gradient(45deg, rgba(0, 255, 0, 0.2), rgba(0, 255, 255, 0.2));
+            border: 1px solid #0ff;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .control-btn:hover {
+            transform: scale(1.05);
+            background: linear-gradient(45deg, rgba(0, 255, 0, 0.4), rgba(0, 255, 255, 0.4));
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+        
+        .control-icon {
+            font-size: 2rem;
+            color: #0ff;
+        }
+        
+        /* Animations */
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .blink {
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 255, 0, 0.1);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #0f0;
+            border-radius: 4px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .matrix-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+            }
+            
+            .status-panel, .dashboard-main, .matrix-terminal {
+                grid-column: 1;
+            }
+            
+            .matrix-controls {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-main {
+                grid-template-columns: 1fr;
+            }
+            
+            .matrix-controls {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 3D Matrix Canvas -->
+    <canvas id="matrix3d"></canvas>
+    
+    <!-- Matrix Interface -->
+    <div class="matrix-container">
+        <!-- Header -->
+        <header class="matrix-header">
+            <div class="logo">
+                <h1 class="cyber-glow">SEAN AMON | 3D SECURITY MATRIX</h1>
+                <div class="subtitle">AUTOMATED THREAT DETECTION & RESPONSE SYSTEM</div>
+            </div>
+            <div class="status-display">
+                <div class="status-item" style="background: transparent; border: none; padding: 0;">
+                    <div class="pulse" style="color: #0f0; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-circle"></i>
+                        <span>SYSTEM: <strong>ACTIVE</strong></span>
+                    </div>
+                    <div style="margin-top: 10px; color: #0ff;">
+                        <i class="far fa-clock"></i>
+                        <span id="matrix-time">--:--:-- UTC</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Status Panel -->
+        <div class="status-panel">
+            <h3><i class="fas fa-brain"></i> AI SECURITY STATUS</h3>
+            <div class="status-item">
+                <div style="display: flex; justify-content: space-between;">
+                    <strong>THREAT DETECTION</strong>
+                    <span class="success">ACTIVE</span>
+                </div>
+                <div style="margin-top: 10px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span>Scanning:</span>
+                        <span>100%</span>
+                    </div>
+                    <div style="background: rgba(0, 255, 0, 0.2); height: 4px; border-radius: 2px;">
+                        <div style="background: #0f0; height: 100%; width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="status-item">
+                <div style="display: flex; justify-content: space-between;">
+                    <strong>NETWORK MONITORING</strong>
+                    <span class="success">ONLINE</span>
+                </div>
+                <div style="margin-top: 10px; font-size: 0.9rem;">
+                    <div>Endpoints: <span style="color: #0ff;">247</span></div>
+                    <div>Threats Blocked: <span style="color: #0ff;" id="threats-blocked">0</span></div>
+                </div>
+            </div>
+            
+            <div class="status-item">
+                <div style="display: flex; justify-content: space-between;">
+                    <strong>AUTOMATED RESPONSE</strong>
+                    <span class="success">ARMED</span>
+                </div>
+                <div style="margin-top: 10px; font-size: 0.9rem;">
+                    <div>Response Time: <span style="color: #0ff;" id="response-time">0ms</span></div>
+                    <div>Incidents: <span style="color: #0ff;" id="incident-count">0</span></div>
+                </div>
+            </div>
+            
+            <div class="status-item">
+                <div style="display: flex; justify-content: space-between;">
+                    <strong>AI ANALYSIS</strong>
+                    <span class="success">THINKING</span>
+                </div>
+                <div style="margin-top: 10px;">
+                    <div class="blink" style="color: #0ff; font-size: 0.9rem;">
+                        Analyzing network patterns...
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Dashboard -->
+        <div class="dashboard-main">
+            <!-- Auto Threat Scanner -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-robot"></i>
+                        AUTO THREAT SCANNER
+                    </div>
+                    <div class="pulse" style="color: #0f0;">
+                        <i class="fas fa-play"></i> ACTIVE
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div style="margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span>Current Scan:</span>
+                            <span class="success" id="scan-target">192.168.1.0/24</span>
+                        </div>
+                        <div style="background: rgba(0, 255, 255, 0.2); height: 6px; border-radius: 3px;">
+                            <div id="scan-progress" style="background: #0ff; height: 100%; width: 0%; transition: width 0.5s;"></div>
+                        </div>
+                    </div>
+                    <div id="scan-results" style="height: 120px; overflow-y: auto; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px;">
+                        <div class="terminal-line output">Ready to scan network...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- AI Threat Intelligence -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-eye"></i>
+                        AI THREAT INTELLIGENCE
+                    </div>
+                    <div class="blink" style="color: #0ff;">
+                        <i class="fas fa-sync-alt fa-spin"></i> LIVE
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div style="margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Active Threats:</span>
+                            <span class="warning" id="active-threats">0</span>
+                        </div>
+                        <div id="threat-feed" style="height: 120px; overflow-y: auto; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px;">
+                            <div class="terminal-line output">Monitoring threat intelligence...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Automated Reporting -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-file-contract"></i>
+                        AUTO REPORTING
+                    </div>
+                    <button onclick="generateAutoReport()" style="background: #0f0; color: #000; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;">
+                        GEN
+                    </button>
+                </div>
+                <div class="card-content">
+                    <div style="margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Last Report:</span>
+                            <span id="last-report">Never</span>
+                        </div>
+                        <div id="report-status" style="height: 120px; overflow-y: auto; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px;">
+                            <div class="terminal-line output">Reports generated automatically every hour</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Real-time Defense -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-shield-alt"></i>
+                        AUTO DEFENSE
+                    </div>
+                    <div class="pulse" style="color: #0f0;">
+                        <i class="fas fa-bolt"></i> ARMED
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div style="margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Defense Status:</span>
+                            <span class="success">ACTIVE</span>
+                        </div>
+                        <div id="defense-log" style="height: 120px; overflow-y: auto; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px;">
+                            <div class="terminal-line success">All defense systems online</div>
+                            <div class="terminal-line output">Firewall: ACTIVE</div>
+                            <div class="terminal-line output">IDS: MONITORING</div>
+                            <div class="terminal-line output">AV: UPDATED</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Terminal -->
+        <div class="matrix-terminal">
+            <div class="terminal-header">
+                <div class="card-title">
+                    <i class="fas fa-terminal"></i>
+                    AUTO COMMAND TERMINAL
+                </div>
+            </div>
+            <div class="terminal-body">
+                <div id="terminal-output">
+                    <div class="terminal-line prompt">AI@matrix:~#</div>
+                    <div class="terminal-line output">Initializing automated security system...</div>
+                    <div class="terminal-line output">Loading threat intelligence database...</div>
+                    <div class="terminal-line success">✓ Neural threat detection online</div>
+                    <div class="terminal-line success">✓ Automated response systems armed</div>
+                    <div class="terminal-line success">✓ Report generation AI activated</div>
+                    <div class="terminal-line prompt">SYSTEM READY FOR AUTONOMOUS OPERATION</div>
+                    <div class="terminal-line warning">Beginning automated network scan...</div>
+                </div>
+                <div style="margin-top: 15px;">
+                    <div class="terminal-line prompt">AI@matrix:~#</div>
+                    <div class="terminal-line blink" style="color: #0ff;">█</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Controls -->
+        <div class="matrix-controls">
+            <div class="control-btn" onclick="executeCommand('full_scan')">
+                <div class="control-icon"><i class="fas fa-satellite-dish"></i></div>
+                <div class="control-text">FULL SCAN</div>
+            </div>
+            
+            <div class="control-btn" onclick="executeCommand('threat_hunt')">
+                <div class="control-icon"><i class="fas fa-search"></i></div>
+                <div class="control-text">THREAT HUNT</div>
+            </div>
+            
+            <div class="control-btn" onclick="executeCommand('generate_report')">
+                <div class="control-icon"><i class="fas fa-file-export"></i></div>
+                <div class="control-text">GEN REPORT</div>
+            </div>
+            
+            <div class="control-btn" onclick="executeCommand('auto_defend')">
+                <div class="control-icon"><i class="fas fa-shield-alt"></i></div>
+                <div class="control-text">AUTO DEFEND</div>
+            </div>
+            
+            <div class="control-btn" onclick="executeCommand('clear_threats')">
+                <div class="control-icon"><i class="fas fa-trash"></i></div>
+                <div class="control-text">CLEAR ALL</div>
+            </div>
+            
+            <div class="control-btn" onclick="executeCommand('simulate_attack')">
+                <div class="control-icon"><i class="fas fa-bomb"></i></div>
+                <div class="control-text">SIM ATTACK</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 3D Matrix Background
+        let scene, camera, renderer;
+        let particles = [];
+        
+        function init3DMatrix() {
+            // Scene
+            scene = new THREE.Scene();
+            
+            // Camera
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 30;
+            
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('matrix3d'), alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000000, 0);
+            
+            // Create particles
+            const particleCount = 2000;
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            
+            for (let i = 0; i < particleCount * 3; i += 3) {
+                positions[i] = (Math.random() - 0.5) * 100;
+                positions[i + 1] = (Math.random() - 0.5) * 100;
+                positions[i + 2] = (Math.random() - 0.5) * 100;
+            }
+            
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            
+            const material = new THREE.PointsMaterial({
+                color: 0x00ff00,
+                size: 0.1,
+                transparent: true,
+                opacity: 0.8
+            });
+            
+            const particleSystem = new THREE.Points(geometry, material);
+            scene.add(particleSystem);
+            particles.push(particleSystem);
+            
+            // Add lines
+            const lineMaterial = new THREE.LineBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0.3 });
+            
+            for (let i = 0; i < 50; i++) {
+                const points = [];
+                points.push(new THREE.Vector3(
+                    (Math.random() - 0.5) * 100,
+                    (Math.random() - 0.5) * 100,
+                    (Math.random() - 0.5) * 100
+                ));
+                points.push(new THREE.Vector3(
+                    (Math.random() - 0.5) * 100,
+                    (Math.random() - 0.5) * 100,
+                    (Math.random() - 0.5) * 100
+                ));
+                
+                const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
+                const line = new THREE.Line(lineGeometry, lineMaterial);
+                scene.add(line);
+                particles.push(line);
+            }
+            
+            // Handle resize
+            window.addEventListener('resize', onWindowResize);
+            
+            // Start animation
+            animate();
+        }
+        
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Rotate particles
+            particles.forEach((particle, i) => {
+                if (particle.rotation) {
+                    particle.rotation.x += 0.001;
+                    particle.rotation.y += 0.002;
+                    particle.rotation.z += 0.0015;
+                }
+                
+                // Move particles
+                if (particle.geometry.attributes.position) {
+                    const positions = particle.geometry.attributes.position.array;
+                    for (let j = 0; j < positions.length; j += 3) {
+                        positions[j + 1] -= 0.05; // Fall down
+                        if (positions[j + 1] < -50) {
+                            positions[j + 1] = 50;
+                        }
+                    }
+                    particle.geometry.attributes.position.needsUpdate = true;
+                }
+            });
+            
+            renderer.render(scene, camera);
+        }
+        
+        // Security Automation System
+        class AutoSecuritySystem {
+            constructor() {
+                this.threats = [];
+                this.scans = [];
+                this.reports = [];
+                this.autoMode = true;
+                this.init();
+            }
+            
+            init() {
+                this.updateTime();
+                setInterval(() => this.updateTime(), 1000);
+                setInterval(() => this.autoScan(), 10000); // Auto scan every 10 seconds
+                setInterval(() => this.autoThreatCheck(), 15000); // Auto threat check every 15 seconds
+                setInterval(() => this.autoReport(), 300000); // Auto report every 5 minutes
+                
+                this.logToTerminal('Automated security system initialized', 'success');
+                this.logToTerminal('Beginning autonomous operation...', 'output');
+                
+                // Start first auto scan
+                setTimeout(() => this.startAutoScan(), 2000);
+            }
+            
+            updateTime() {
+                const now = new Date();
+                document.getElementById('matrix-time').textContent = 
+                    now.toUTCString().split(' ')[4] + ' UTC';
+            }
+            
+            autoScan() {
+                if (!this.autoMode) return;
+                
+                const targets = [
+                    '192.168.1.0/24',
+                    '10.0.0.0/24',
+                    '172.16.0.0/24',
+                    'External Network Scan'
+                ];
+                
+                const randomTarget = targets[Math.floor(Math.random() * targets.length)];
+                this.startScan(randomTarget);
+            }
+            
+            startAutoScan() {
+                const targets = ['192.168.1.0/24', '10.0.0.0/16', 'Corporate Network'];
+                const target = targets[Math.floor(Math.random() * targets.length)];
+                
+                document.getElementById('scan-target').textContent = target;
+                this.logToTerminal(`Starting automated scan: ${target}`, 'warning');
+                
+                // Simulate scan progress
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += Math.random() * 10;
+                    document.getElementById('scan-progress').style.width = Math.min(progress, 100) + '%';
+                    
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        this.completeScan(target);
+                    }
+                }, 200);
+            }
+            
+            completeScan(target) {
+                const threatsFound = Math.floor(Math.random() * 5);
+                const resultsDiv = document.getElementById('scan-results');
+                
+                if (threatsFound > 0) {
+                    resultsDiv.innerHTML = `
+                        <div class="terminal-line warning">Scan completed: ${target}</div>
+                        <div class="terminal-line error">Found ${threatsFound} potential threats</div>
+                        <div class="terminal-line output">Running deep analysis...</div>
+                    `;
+                    
+                    // Simulate analysis
+                    setTimeout(() => {
+                        this.detectThreats(threatsFound);
+                    }, 2000);
+                } else {
+                    resultsDiv.innerHTML = `
+                        <div class="terminal-line success">Scan completed: ${target}</div>
+                        <div class="terminal-line output">No threats detected</div>
+                        <div class="terminal-line output">Network appears secure</div>
+                    `;
+                }
+                
+                // Update threats blocked
+                const threatsBlocked = document.getElementById('threats-blocked');
+                threatsBlocked.textContent = parseInt(threatsBlocked.textContent) + threatsFound;
+                
+                // Update response time
+                document.getElementById('response-time').textContent = 
+                    Math.floor(Math.random() * 100) + 50 + 'ms';
+            }
+            
+            detectThreats(count) {
+                const threatTypes = [
+                    'Port Scanning Activity',
+                    'Suspicious Login Attempts',
+                    'Malware Beacon Detected',
+                    'Data Exfiltration Attempt',
+                    'DNS Tunneling Suspicion',
+                    'Brute Force Attack',
+                    'Phishing Campaign'
+                ];
+                
+                const resultsDiv = document.getElementById('scan-results');
+                resultsDiv.innerHTML += `<div class="terminal-line error">THREATS DETECTED:</div>`;
+                
+                for (let i = 0; i < count; i++) {
+                    const threat = {
+                        id: Date.now() + i,
+                        type: threatTypes[Math.floor(Math.random() * threatTypes.length)],
+                        severity: ['low', 'medium', 'high'][Math.floor(Math.random() * 3)],
+                        source: `IP: 192.168.1.${Math.floor(Math.random() * 255)}`,
+                        time: new Date().toLocaleTimeString()
+                    };
+                    
+                    this.threats.push(threat);
+                    resultsDiv.innerHTML += `
+                        <div class="terminal-line warning">• ${threat.type} (${threat.severity})</div>
+                    `;
+                    
+                    // Add to threat feed
+                    this.addToThreatFeed(threat);
+                }
+                
+                resultsDiv.innerHTML += `<div class="terminal-line success">Automated response initiated...</div>`;
+                
+                // Update active threats count
+                document.getElementById('active-threats').textContent = this.threats.length;
+                
+                // Auto defend
+                setTimeout(() => this.autoDefend(), 1000);
+            }
+            
+            addToThreatFeed(threat) {
+                const feed = document.getElementById('threat-feed');
+                const entry = document.createElement('div');
+                entry.className = 'terminal-line ' + (threat.severity === 'high' ? 'error' : 'warning');
+                entry.textContent = `[${threat.time}] ${threat.type}`;
+                feed.appendChild(entry);
+                feed.scrollTop = feed.scrollHeight;
+                
+                // Update incident count
+                document.getElementById('incident-count').textContent = this.threats.length;
+            }
+            
+            autoDefend() {
+                const log = document.getElementById('defense-log');
+                const responses = [
+                    'Blocked malicious IP addresses',
+                    'Updated firewall rules',
+                    'Isolated infected endpoints',
+                    'Applied security patches',
+                    'Enhanced monitoring rules',
+                    'Initiated incident response'
+                ];
+                
+                responses.forEach((response, i) => {
+                    setTimeout(() => {
+                        const entry = document.createElement('div');
+                        entry.className = 'terminal-line success';
+                        entry.textContent = `✓ ${response}`;
+                        log.appendChild(entry);
+                        log.scrollTop = log.scrollHeight;
+                        
+                        this.logToTerminal(`Auto defense: ${response}`, 'success');
+                    }, i * 500);
+                });
+                
+                // Clear some threats after defense
+                setTimeout(() => {
+                    if (this.threats.length > 0) {
+                        const cleared = Math.min(3, this.threats.length);
+                        this.threats.splice(0, cleared);
+                        document.getElementById('active-threats').textContent = this.threats.length;
+                        
+                        this.logToTerminal(`Auto defense cleared ${cleared} threats`, 'success');
+                    }
+                }, 3000);
+            }
+            
+            autoThreatCheck() {
+                if (!this.autoMode) return;
+                
+                // Occasionally detect new threats
+                if (Math.random() > 0.7) {
+                    const newThreats = Math.floor(Math.random() * 3);
+                    if (newThreats > 0) {
+                        this.logToTerminal(`AI detected ${newThreats} new potential threats`, 'warning');
+                        this.detectThreats(newThreats);
+                    }
+                }
+            }
+            
+            autoReport() {
+                if (!this.autoMode) return;
+                
+                this.generateReport('auto');
+            }
+            
+            generateReport(type = 'manual') {
+                const reportDiv = document.getElementById('report-status');
+                const now = new Date();
+                
+                reportDiv.innerHTML = `
+                    <div class="terminal-line prompt">Generating ${type} report...</div>
+                    <div class="terminal-line output">Time: ${now.toLocaleString()}</div>
+                    <div class="terminal-line output">Threats Detected: ${this.threats.length}</div>
+                    <div class="terminal-line output">Scans Completed: ${this.scans.length}</div>
+                    <div class="terminal-line success">Report compiled successfully</div>
+                `;
+                
+                document.getElementById('last-report').textContent = now.toLocaleTimeString();
+                
+                // Auto download
+                if (type === 'auto') {
+                    setTimeout(() => {
+                        this.downloadReport();
+                    }, 2000);
+                }
+                
+                this.logToTerminal(`${type} security report generated`, 'success');
+            }
+            
+            downloadReport() {
+                const report = {
+                    timestamp: new Date().toISOString(),
+                    threats: this.threats.length,
+                    scans: this.scans.length,
+                    system: 'Sean Amon 3D Security Matrix',
+                    summary: 'Automated security assessment completed'
+                };
+                
+                const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `security_report_${Date.now()}.json`;
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                this.logToTerminal('Report auto-downloaded', 'success');
+            }
+            
+            logToTerminal(message, type = 'output') {
+                const terminal = document.getElementById('terminal-output');
+                const line = document.createElement('div');
+                line.className = `terminal-line ${type}`;
+                line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+                terminal.appendChild(line);
+                terminal.scrollTop = terminal.scrollHeight;
+            }
+            
+            startScan(target) {
+                document.getElementById('scan-target').textContent = target;
+                this.logToTerminal(`Starting scan: ${target}`, 'warning');
+                
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += Math.random() * 15;
+                    document.getElementById('scan-progress').style.width = Math.min(progress, 100) + '%';
+                    
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        this.completeScan(target);
+                    }
+                }, 300);
+            }
+        }
+        
+        // Command execution
+        function executeCommand(command) {
+            const system = window.securitySystem;
+            
+            switch(command) {
+                case 'full_scan':
+                    system.startScan('Full Network Deep Scan');
+                    break;
+                case 'threat_hunt':
+                    system.logToTerminal('Initiating proactive threat hunting...', 'warning');
+                    system.detectThreats(Math.floor(Math.random() * 4) + 1);
+                    break;
+                case 'generate_report':
+                    system.generateReport('manual');
+                    break;
+                case 'auto_defend':
+                    system.logToTerminal('Activating automated defense systems...', 'warning');
+                    system.autoDefend();
+                    break;
+                case 'clear_threats':
+                    system.threats = [];
+                    document.getElementById('active-threats').textContent = '0';
+                    document.getElementById('threat-feed').innerHTML = 
+                        '<div class="terminal-line output">Threat feed cleared</div>';
+                    system.logToTerminal('All threats cleared manually', 'success');
+                    break;
+                case 'simulate_attack':
+                    system.logToTerminal('Simulating cyber attack...', 'error');
+                    setTimeout(() => {
+                        system.detectThreats(3);
+                    }, 1000);
+                    break;
+            }
+        }
+        
+        function generateAutoReport() {
+            window.securitySystem.generateReport('manual');
+        }
+        
+        // Initialize everything
+        window.onload = () => {
+            // Start 3D Matrix
+            init3DMatrix();
+            
+            // Start security system
+            window.securitySystem = new AutoSecuritySystem();
+            
+            // Add some initial activity
+            setTimeout(() => {
+                window.securitySystem.logToTerminal('Automated systems engaged', 'success');
+                window.securitySystem.logToTerminal('Monitoring all network traffic', 'output');
+                window.securitySystem.logToTerminal('Threat intelligence feeds active', 'success');
+            }, 3000);
+        };
+        
+        // Make functions global for onclick handlers
+        window.executeCommand = executeCommand;
+        window.generateAutoReport = generateAutoReport;
+    </script>
+</body>
+</html>
